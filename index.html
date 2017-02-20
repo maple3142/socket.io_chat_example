@@ -5,29 +5,34 @@
             * { margin: 0; padding: 0; box-sizing: border-box; }
             body { font: 13px Helvetica, Arial; }
             form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
-            form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
-            form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+            form input { border: 0; padding: 10px; width: 70vw; margin-right: .5%; }
+            form button { width: 9vw; background: rgb(130, 224, 255); border: none; padding: 10px; }
             ul {position: fixed;bottom: 6%; width: 100%;}
             #messages { list-style-type: none; margin: 0; padding: 0; }
             #messages li { padding: 5px 10px; font-weight:bold; font-size: 120%;}
             #messages li:nth-child(odd) { background: #eee; }
             .sender:nth-child(odd){font-size: 90%; font-weight:normal; padding: 5px 20px;}
             .announcement{color:rgb(130, 224, 255)}
+            .cn{ width: 17vw}
         </style>
         <title>test</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script src="./js/toast.js"></script>
-        <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
-        <script
-  src="http://code.jquery.com/jquery-3.1.1.min.js"
-  crossorigin="anonymous"></script>
+        <script src="./js/socket.io.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/autolinker/1.4.1/Autolinker.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/latest/js.cookie.min.js"></script>
+        <script src="http://code.jquery.com/jquery-3.1.1.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.6/css/jquery.fancybox.min.css" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.6/js/jquery.fancybox.min.js"></script>
     </head>
     <body>
         <ul id="messages"></ul>
         <form action="">
-            <input id="text" autocomplete="off" /><button>Send</button>
+            <input id="text" autocomplete="off" /><button>Send</button><button onclick="Cookies.remove('nick');window.location.reload();" class="cn">ChangeNick</button>
         </form>
         <script>
-            while(!(window.nick=prompt('nick:')));
+            while(!(window.nick=Cookies.get('nick')||prompt('nick:')));
+            Cookies.set('nick',window.nick,{expires:30});
             function parseD(o){
                 return o.h+':'+o.m;
             }
@@ -46,7 +51,10 @@
             });
             socket.on('chat',(msg)=>{
                 msg=JSON.parse(msg);
-                $('#messages').append( $('<li>').html( msg.msg+'<span class="sender">--'+msg.nick+'</span>'+parseD(msg) ) );
+                var message=Autolinker.link(msg.msg);
+                message=message.replace(/<.*(https?:\/\/.*?\.(?:png|jpg)).*>/gi,'<a class="fancybox" rel="group" href="$1"><img width="50%" height="50%" src="$1" alt="$1"></a>');
+                $('#messages').append( $('<li>').html( message+'   <span class="sender">--'+msg.nick+'</span>   '+parseD(msg) ) );
+                $(".fancybox").fancybox();
                 toast(msg.nick+': '+msg.msg,2000);
             });
             socket.on('userjoined',(msg)=>{

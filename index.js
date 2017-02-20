@@ -7,9 +7,7 @@ var schedule=require('node-schedule');
 var log=console.log;
 console.log=t=>{
 	log(t);
-	fs.appendFile("./log.txt",t+'\n',(err)=>{
-
-	}); 
+	fs.appendFile("./log.txt",t+'\n',err=>{}); 
 };
 app.get('/',(req,res)=>{
   res.sendFile(__dirname+'/index.html');
@@ -52,6 +50,8 @@ io.on('connection',(socket)=>{
 });
 var rule=new schedule.RecurrenceRule();
 rule.hour=0;
+rule.minute=0;
+rule.second=0;
 schedule.scheduleJob(rule,()=>{
   var s=new Date().getMonth()+'/'+new Date().getDate();
   console.log(s);
