@@ -7,6 +7,7 @@
             form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
             form input { border: 0; padding: 10px; width: 70vw; margin-right: .5%; }
             form button { width: 9vw; background: rgb(130, 224, 255); border: none; padding: 10px; }
+            form button:disabled { width: 9vw; background:gainsboro; border: none; padding: 10px; }
             ul {position: fixed;bottom: 6%; width: 100%;}
             #messages { list-style-type: none; margin: 0; padding: 0; }
             #messages li { padding: 5px 10px; font-weight:bold; font-size: 120%;}
@@ -28,25 +29,35 @@
     <body>
         <ul id="messages"></ul>
         <form action="">
-            <input id="text" autocomplete="off" /><button>Send</button><button onclick="Cookies.remove('nick');window.location.reload();" class="cn">ChangeNick</button>
+            <input id="text" autocomplete="off" /><button id="send">Send</button><button onclick="Cookies.remove('nick');window.location.reload();" class="cn">ChangeNick</button>
         </form>
         <script>
             while(!(window.nick=Cookies.get('nick')||prompt('nick:')));
             Cookies.set('nick',window.nick,{expires:30});
             function parseD(o){
-                return o.h+':'+o.m;
+                return o.h+':'+(o.m<10?'0'+o.m:o.m);
             }
             var socket=io.connect('http://maple3142.net:8080/');
             socket.emit('userjoined',JSON.stringify({
                     nick: window.nick
             }));
+            window._wait=3;
             $('form').submit(function(){
                 if(!$('#text').val())return false;
                 socket.emit('chat',JSON.stringify({
                     msg: $('#text').val(),
                     nick: window.nick
                 }));
-                $('#text').val('')
+                $('#text').val('');
+                if(window._wait){
+                    $('#text').val('wait '+window._wait+' second...');
+                    $('#text,#send').attr('disabled','')
+                    var t=setInterval(()=>{
+                        $('#text,#send').removeAttr('disabled');
+                        $('#text').val('');
+                        clearInterval(t);
+                    },window._wait*1000);
+                }
                 return false;
             });
             socket.on('chat',(msg)=>{

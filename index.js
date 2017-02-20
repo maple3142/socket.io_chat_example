@@ -2,6 +2,7 @@ var app=require('express')();
 var http=require('http').Server(app);
 var io=require('socket.io')(http);
 var fs=require('fs');
+var path=require('path');
 var schedule=require('node-schedule');
 
 var log=console.log;
@@ -10,10 +11,10 @@ console.log=t=>{
 	fs.appendFile("./log.txt",t+'\n',err=>{}); 
 };
 app.get('/',(req,res)=>{
-  res.sendFile(__dirname+'/index.html');
+  res.sendFile(path.join(__dirname,'index.html'));
 });
 app.get('/js/:js',(req,res)=>{
-  res.sendFile(__dirname+'/js/'+req.params.js);
+  res.sendFile(path.join(path.join(__dirname,'js'),req.params.js));
 });
 app.listen(80,()=>console.log('server listen on *80'));
 
