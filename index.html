@@ -42,8 +42,23 @@
                     nick: window.nick
             }));
             window._wait=3;
+            var _l=[],_now=0;
+            $('#text').on('keyup',e=>{
+                if(e.keyCode==38){
+                    _now--;
+                    if(_now<0)_now=0;
+                    $('#text').val(_l[_now]);
+                }
+                if(e.keyCode==40){
+                    _now++;
+                    if(_now>=_l.length)_now=_l.length;
+                    $('#text').val(_l[_now]);
+                }
+            });
             $('form').submit(function(){
                 if(!$('#text').val())return false;
+                _l.push($('#text').val());
+                _now=_l.length;
                 socket.emit('chat',JSON.stringify({
                     msg: $('#text').val(),
                     nick: window.nick
@@ -63,7 +78,7 @@
             socket.on('chat',(msg)=>{
                 msg=JSON.parse(msg);
                 var message=Autolinker.link(msg.msg);
-                message=message.replace(/<.*(https?:\/\/.*?\.(?:png|jpg)).*>/gi,'<a class="fancybox" rel="group" href="$1"><img width="50%" height="50%" src="$1" alt="$1"></a>');
+                message=message.replace(/<.*(https?:\/\/.*?\.(?:png|jpg)).*>/gi,'<a class="fancybox" rel="group" href="$1"><img width="50%" height="50%" src="$1" alt="$1">$1</a>');
                 $('#messages').append( $('<li>').html( message+'   <span class="sender">--'+msg.nick+'</span>   '+parseD(msg) ) );
                 $(".fancybox").fancybox();
                 toast(msg.nick+': '+msg.msg,2000);
