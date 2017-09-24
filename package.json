@@ -4,13 +4,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "author": "maple3142 <kirby741852963@gmail.com> (http://maple3142.net/)",
   "license": "ISC",
   "dependencies": {
     "express": "^4.14.1",
     "node-schedule": "^1.2.0",
-    "socket.io": "^1.7.3"
-  }
+    "socket.io": "^2.0.2",
+    "snyk": "^1.41.1"
+  },
+  "snyk": true
 }
